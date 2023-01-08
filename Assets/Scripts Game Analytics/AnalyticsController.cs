@@ -18,7 +18,7 @@ public class SpatialData : EventData
     float floatRounding = 100f;
 
     public uint playerID;
-    public Vector3 position;
+    public float x, y, z;
     public DateTime dateTime;
 
     public SpatialData(string type, uint playerID, Vector3 position, DateTime dateTime)
@@ -26,10 +26,9 @@ public class SpatialData : EventData
         this.type = type;
         this.playerID = playerID;
 
-        this.position = position;
-        position.x = Mathf.Round(position.x * floatRounding) / floatRounding;
-        position.y = Mathf.Round(position.y * floatRounding) / floatRounding;
-        position.z = Mathf.Round(position.z * floatRounding) / floatRounding;
+        x = Mathf.Round(position.x * floatRounding) / floatRounding;
+        y = Mathf.Round(position.y * floatRounding) / floatRounding;
+        z = Mathf.Round(position.z * floatRounding) / floatRounding;
 
         this.dateTime = dateTime;
     }
