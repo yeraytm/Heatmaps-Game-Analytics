@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using Gamekit3D;
 
 public class DataCollector : MonoBehaviour
 {
@@ -8,39 +7,31 @@ public class DataCollector : MonoBehaviour
 
     public Transform player;
 
-    public static event Action<EventData> PositionEvent;
-    public static event Action<EventData> KillEvent;
-    public static event Action<EventData> DeathEvent;
+    public static event Action<EventData> SpatialEvent;
 
     float elapsedUpdateTime = 0f;
 
-    void Start()
-    {
-    }
-
     void Update()
     {
-        //elapsedUpdateTime += Time.deltaTime;
-        //if (elapsedUpdateTime >= 4.0f)
-        //{
-        //    Debug.Log(player.transform.position);
-        //    PositionEvent?.Invoke(new SpatialData("Position", playerID, player.transform.position, DateTime.Now));
-        //    elapsedUpdateTime = elapsedUpdateTime % 1f;
-        //}
+        elapsedUpdateTime += Time.deltaTime;
+        if (elapsedUpdateTime >= 0.5f)
+        {
+            SpatialData positionData = new SpatialData("Position", playerID, player.transform.position, DateTime.Now);
+            SpatialEvent?.Invoke(positionData);
+
+            elapsedUpdateTime = elapsedUpdateTime % 1f;
+        }
     }
 
     public void TriggerKillEvent()
     {
-        Debug.Log("KILL EVENT IS TRIGGERED!");
-        Debug.Log(player.position);
         SpatialData killData = new SpatialData("Kill", playerID, player.position, DateTime.Now);
-        KillEvent?.Invoke(killData);
+        SpatialEvent?.Invoke(killData);
     }
 
     public void TriggerDeathEvent()
     {
-        Debug.Log("DEATH EVENT IS TRIGGERED!");
-        Debug.Log(player.position);
-        DeathEvent?.Invoke(new SpatialData("Death", playerID, player.position, DateTime.Now));
+        SpatialData deathData = new SpatialData("Death", playerID, player.position, DateTime.Now);
+        SpatialEvent?.Invoke(deathData);
     }
 }

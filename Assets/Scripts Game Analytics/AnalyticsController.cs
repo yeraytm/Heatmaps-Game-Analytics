@@ -1,8 +1,7 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using System;
 
 public abstract class EventData
 {
@@ -39,67 +38,46 @@ public class SpatialData : EventData
 
         form.AddField("PlayerID", playerID.ToString());
 
-        form.AddField("PositionX", position.x.ToString("F2"));
-        form.AddField("PositionY", position.y.ToString("F2"));
-        form.AddField("PositionZ", position.z.ToString("F2"));
+        form.AddField("PositionX", position.x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
+        form.AddField("PositionY", position.y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
+        form.AddField("PositionZ", position.z.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
 
         form.AddField("Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
 
         return form;
-
-        //string ret = JsonUtility.ToJson(this);
-        //return ret;
     }
 }
 
 public class AnalyticsController : MonoBehaviour
 {
-    string db = "https://citmalumnes.upc.es/~yeraytm/spatial_data.php";
+    public string db = "https://citmalumnes.upc.es/~yeraytm/spatial_data.php";
 
     void OnEnable()
     {
-        DataCollector.PositionEvent += SendEvent;
-        DataCollector.KillEvent += SendEvent;
-        DataCollector.DeathEvent += SendEvent;
+        DataCollector.SpatialEvent += SendEvent;
     }
 
     void SendEvent(EventData data)
     {
-        Debug.Log("SENDING " + data.type + " EVENT");
         StartCoroutine(Send(data));
     }
 
     IEnumerator Send(EventData data)
     {
-        WWW request = new WWW(db, data.Serialize());
+        UnityWebRequest request = UnityWebRequest.Post(db, data.Serialize());
 
-        yield return request;
+        yield return request.SendWebRequest();
 
         // Check for errors
         if (string.IsNullOrEmpty(request.error))
         {
-            Debug.Log("SENT REQUEST SUCCESS: " + request.text);
+            Debug.Log("[REQUEST SUCCESS] Response Code: " + request.responseCode + '\n' + "[REQUEST SUCCESS] Ouput: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.Log("SENT REQUEST ERROR: " + request.error);
+            Debug.Log("[REQUEST ERROR] Error code: " + request.error);
         }
 
         request.Dispose();
-
-        //UnityWebRequest request = UnityWebRequest.Post(db, data.Serialize());
-        //request.SetRequestHeader("Content-Type", "application/json");
-
-        //yield return request.SendWebRequest();
-
-        //// Check for errors
-        //if (string.IsNullOrEmpty(request.error))
-        //{
-        //    Debug.Log("SENT REQUEST SUCCESS: " + request.responseCode);
-        //}
-        //else
-        //{
-        //    Debug.Log("SENT REQUEST ERROR: " + request.error);
-        //}
     }
 }
