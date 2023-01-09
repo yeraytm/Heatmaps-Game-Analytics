@@ -75,7 +75,7 @@ public class AnalyticsController : MonoBehaviour
         }
         else
         {
-            Debug.Log("[REQUEST ERROR] Error code: " + request.error);
+            Debug.Log("[REQUEST ERROR] Error Code: " + request.error);
         }
 
         request.Dispose();
