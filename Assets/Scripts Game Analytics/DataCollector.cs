@@ -6,7 +6,7 @@ public class DataCollector : MonoBehaviour
 {
     public uint playerID = 0;
 
-    public PlayerController player;
+    public Transform player;
 
     public static event Action<EventData> PositionEvent;
     public static event Action<EventData> KillEvent;
@@ -32,15 +32,15 @@ public class DataCollector : MonoBehaviour
     public void TriggerKillEvent()
     {
         Debug.Log("KILL EVENT IS TRIGGERED!");
-        Debug.Log(player.transform.position);
-        SpatialData killData = new SpatialData("Kill", playerID, player.transform.position, DateTime.Now);
+        Debug.Log(player.position);
+        SpatialData killData = new SpatialData("Kill", playerID, player.position, DateTime.Now);
         KillEvent?.Invoke(killData);
     }
 
     public void TriggerDeathEvent()
     {
         Debug.Log("DEATH EVENT IS TRIGGERED!");
-        Debug.Log(player.transform.position);
-        DeathEvent?.Invoke(new SpatialData("Death", playerID, player.transform.position, DateTime.Now));
+        Debug.Log(player.position);
+        DeathEvent?.Invoke(new SpatialData("Death", playerID, player.position, DateTime.Now));
     }
 }
