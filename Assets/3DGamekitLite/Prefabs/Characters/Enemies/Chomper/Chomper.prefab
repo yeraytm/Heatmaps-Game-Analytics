@@ -3555,7 +3555,7 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5992741992194029010, guid: 866520d76ddc4754c9db2f40f4881abe,
+      - m_Target: {fileID: 7623468027711606594, guid: a874c7e9134a68c47aaa1a1984dc94c1,
           type: 3}
         m_TargetAssemblyTypeName: DataCollector, Assembly-CSharp
         m_MethodName: TriggerKillEvent

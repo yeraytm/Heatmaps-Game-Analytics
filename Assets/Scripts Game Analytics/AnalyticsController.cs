@@ -8,47 +8,47 @@ public abstract class EventData
 {
     string url;
 
-    public string Type;
+    public string type;
 
-    public abstract string GetSerialize();
+    public abstract WWWForm Serialize();
 }
 
 public class SpatialData : EventData
 {
-    float floatRounding = 100f;
+    public uint playerID;
+    public Vector3 position;
+    public DateTime date;
 
-    public uint PlayerID;
-    public float PositionX, PositionY, PositionZ;
-    public DateTime DateTime;
-
-    public SpatialData(string type, uint playerID, Vector3 position, DateTime dateTime)
+    public SpatialData(string type, uint playerID, Vector3 pos, DateTime date)
     {
-        this.Type = type;
-        this.PlayerID = playerID;
+        this.type = type;
+        this.playerID = playerID;
 
-        PositionX = Mathf.Round(position.x * floatRounding) / floatRounding;
-        PositionY = Mathf.Round(position.y * floatRounding) / floatRounding;
-        PositionZ = Mathf.Round(position.z * floatRounding) / floatRounding;
+        position.x = pos.x;
+        position.y = pos.y;
+        position.z = pos.z;
 
-        this.DateTime = dateTime;
+        this.date = date;
     }
 
-    public override string GetSerialize()
+    public override WWWForm Serialize()
     {
-        return JsonUtility.ToJson(this);
+        WWWForm form = new WWWForm();
 
-        //form = new WWWForm();
+        form.AddField("Type", type);
 
-        //form.AddField("Type", type);
+        form.AddField("PlayerID", playerID.ToString());
 
-        //form.AddField("PlayerID", playerID.ToString());
+        form.AddField("PositionX", position.x.ToString("F2"));
+        form.AddField("PositionY", position.y.ToString("F2"));
+        form.AddField("PositionZ", position.z.ToString("F2"));
 
-        //form.AddField("Position.x", position.x.ToString("0.00"));
-        //form.AddField("Position.y", position.y.ToString("0.00"));
-        //form.AddField("Position.z", position.z.ToString("0.00"));
+        form.AddField("Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
 
-        //form.AddField("Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss"));
-        //return form;
+        return form;
+
+        //string ret = JsonUtility.ToJson(this);
+        //return ret;
     }
 }
 
@@ -65,27 +65,41 @@ public class AnalyticsController : MonoBehaviour
 
     void SendEvent(EventData data)
     {
+        Debug.Log("SENDING " + data.type + " EVENT");
         StartCoroutine(Send(data));
     }
 
     IEnumerator Send(EventData data)
     {
-        UnityWebRequest request = UnityWebRequest.Post(db, data.GetSerialize());
-        request.SetRequestHeader("Accept", "application/json");
-        request.SetRequestHeader("Content-Type", "application/json");
+        WWW request = new WWW(db, data.Serialize());
 
-        //WWW request = new WWW(db, data.GetSerialize());
-
-        yield return request.SendWebRequest();
+        yield return request;
 
         // Check for errors
         if (string.IsNullOrEmpty(request.error))
         {
-            Debug.Log("SENT REQUEST SUCCESS: " + request.responseCode);
+            Debug.Log("SENT REQUEST SUCCESS: " + request.text);
         }
         else
         {
             Debug.Log("SENT REQUEST ERROR: " + request.error);
         }
+
+        request.Dispose();
+
+        //UnityWebRequest request = UnityWebRequest.Post(db, data.Serialize());
+        //request.SetRequestHeader("Content-Type", "application/json");
+
+        //yield return request.SendWebRequest();
+
+        //// Check for errors
+        //if (string.IsNullOrEmpty(request.error))
+        //{
+        //    Debug.Log("SENT REQUEST SUCCESS: " + request.responseCode);
+        //}
+        //else
+        //{
+        //    Debug.Log("SENT REQUEST ERROR: " + request.error);
+        //}
     }
 }
