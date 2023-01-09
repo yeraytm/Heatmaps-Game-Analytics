@@ -8,7 +8,7 @@ public abstract class EventData
 {
     string url;
 
-    public string type;
+    public string Type;
 
     public abstract string GetSerialize();
 }
@@ -17,20 +17,20 @@ public class SpatialData : EventData
 {
     float floatRounding = 100f;
 
-    public uint playerID;
-    public float x, y, z;
-    public DateTime dateTime;
+    public uint PlayerID;
+    public float PositionX, PositionY, PositionZ;
+    public DateTime DateTime;
 
     public SpatialData(string type, uint playerID, Vector3 position, DateTime dateTime)
     {
-        this.type = type;
-        this.playerID = playerID;
+        this.Type = type;
+        this.PlayerID = playerID;
 
-        x = Mathf.Round(position.x * floatRounding) / floatRounding;
-        y = Mathf.Round(position.y * floatRounding) / floatRounding;
-        z = Mathf.Round(position.z * floatRounding) / floatRounding;
+        PositionX = Mathf.Round(position.x * floatRounding) / floatRounding;
+        PositionY = Mathf.Round(position.y * floatRounding) / floatRounding;
+        PositionZ = Mathf.Round(position.z * floatRounding) / floatRounding;
 
-        this.dateTime = dateTime;
+        this.DateTime = dateTime;
     }
 
     public override string GetSerialize()
