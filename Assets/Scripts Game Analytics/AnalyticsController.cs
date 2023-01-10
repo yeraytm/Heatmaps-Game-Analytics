@@ -5,8 +5,6 @@ using UnityEngine.Networking;
 
 public abstract class EventData
 {
-    string url;
-
     public string type;
 
     public abstract WWWForm Serialize();
@@ -16,9 +14,9 @@ public class SpatialData : EventData
 {
     public uint playerID;
     public Vector3 position;
-    public DateTime date;
+    public float deltaTime;
 
-    public SpatialData(string type, uint playerID, Vector3 pos, DateTime date)
+    public SpatialData(string type, uint playerID, Vector3 pos, float deltaTime)
     {
         this.type = type;
         this.playerID = playerID;
@@ -27,7 +25,7 @@ public class SpatialData : EventData
         position.y = pos.y;
         position.z = pos.z;
 
-        this.date = date;
+        this.deltaTime = deltaTime;
     }
 
     public override WWWForm Serialize()
@@ -42,7 +40,7 @@ public class SpatialData : EventData
         form.AddField("PositionY", position.y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
         form.AddField("PositionZ", position.z.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
 
-        form.AddField("Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
+        form.AddField("DeltaTime", deltaTime.ToString("F3", System.Globalization.CultureInfo.InvariantCulture));
 
         return form;
     }

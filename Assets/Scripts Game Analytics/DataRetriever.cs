@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -6,6 +7,10 @@ public class DataRetriever : MonoBehaviour
 {
     public string db = "https://citmalumnes.upc.es/~yeraytm/query_spatial_data.php";
     uint count = 0;
+
+    List<SpatialData> positions = new List<SpatialData>();
+    List<SpatialData> kills = new List<SpatialData>();
+    List<SpatialData> deaths = new List<SpatialData>();
 
     void Start()
     {
@@ -42,13 +47,33 @@ public class DataRetriever : MonoBehaviour
                             {
                                 string[] rowData = rows[i].Split('#');
 
+                                float x = float.Parse(rowData[2], System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
+                                float y = float.Parse(rowData[3], System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
+                                float z = float.Parse(rowData[4], System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
+                                Vector3 position = new Vector3(x, y, z);
+
+                                SpatialData entry = new SpatialData(rowData[0], uint.Parse(rowData[1]), position, float.Parse(rowData[5]));
+
+                                switch (entry.type)
+                                {
+                                    case "Position":
+                                        positions.Add(entry);
+                                        break;
+                                    case "Kill":
+                                        kills.Add(entry);
+                                        break;
+                                    case "Death":
+                                        deaths.Add(entry);
+                                        break;
+                                }
+
                                 Debug.Log(
                                     "Type: " + rowData[0] +
-                                    " PlayerID: " + rowData[1] +
-                                    " PositionX: " + rowData[2] +
-                                    " PositionY: " + rowData[3] +
-                                    " PositionZ: " + rowData[4] +
-                                    " Date: " + rowData[5]
+                                    " PlayerID: " + uint.Parse(rowData[1]) +
+                                    " PositionX: " + position.x +
+                                    " PositionY: " + position.y +
+                                    " PositionZ: " + position.z +
+                                    " DeltaTime: " + float.Parse(rowData[5])
                                     );
                                 count++;
                             }
@@ -57,6 +82,6 @@ public class DataRetriever : MonoBehaviour
                     }
             }
         }
-        Debug.Log("TOTAL ROWS: " + count);
+        Debug.Log("TOTAL ROWS RETRIEVED: " + count);
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class DataCollector : MonoBehaviour
 {
+    public float samplingRate = 1.0f;
+
     public uint playerID = 0;
 
     public Transform player;
@@ -14,9 +16,9 @@ public class DataCollector : MonoBehaviour
     void Update()
     {
         elapsedUpdateTime += Time.deltaTime;
-        if (elapsedUpdateTime >= 0.5f)
+        if (elapsedUpdateTime >= samplingRate)
         {
-            SpatialData positionData = new SpatialData("Position", playerID, player.transform.position, DateTime.Now);
+            SpatialData positionData = new SpatialData("Position", playerID, player.transform.position, Time.time);
             SpatialEvent?.Invoke(positionData);
 
             elapsedUpdateTime = elapsedUpdateTime % 1f;
@@ -25,13 +27,13 @@ public class DataCollector : MonoBehaviour
 
     public void TriggerKillEvent()
     {
-        SpatialData killData = new SpatialData("Kill", playerID, player.position, DateTime.Now);
+        SpatialData killData = new SpatialData("Kill", playerID, player.position, Time.time);
         SpatialEvent?.Invoke(killData);
     }
 
     public void TriggerDeathEvent()
     {
-        SpatialData deathData = new SpatialData("Death", playerID, player.position, DateTime.Now);
+        SpatialData deathData = new SpatialData("Death", playerID, player.position, Time.time);
         SpatialEvent?.Invoke(deathData);
     }
 }
