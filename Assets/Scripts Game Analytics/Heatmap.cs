@@ -5,27 +5,29 @@ using CodeMonkey.Utils;
 
 public class Heatmap
 {
-    public int HEAT_MAP_MAX_VALUE = 100;
-    public const int HEAT_MAP_MIN_VALUE = 0;
+    public float HEAT_MAP_MAX_VALUE = 100f;
+    public const float HEAT_MAP_MIN_VALUE = 0f;
 
     private int width;
     private int height;
     private float cellSize;
     private Vector3 originPosition;
-    private int[,] gridArray;
+    private float[,] gridArray;
     private TextMesh[,] debugTextArray;
     private Vector3[] positionArray = new Vector3[0]; // The actual data!
     private Gradient gradient;
+    private List<SpatialData> spatialDatas;
 
-    public Heatmap(int width, int height, float cellSize, Vector3 originPosition, Gradient gradient, GameObject cubeGO)
+    public Heatmap(int width, int height, float cellSize, Vector3 originPosition, Gradient gradient, List<SpatialData> spatialDatas, GameObject cubeGO)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
         this.originPosition = originPosition;
         this.gradient = gradient;
+        this.spatialDatas = spatialDatas;
 
-        gridArray = new int[width, height];
+        gridArray = new float[width, height];
         debugTextArray = new TextMesh[width, height];
 
         for (int x = 0; x < gridArray.GetLength(0); x++)
@@ -35,22 +37,22 @@ public class Heatmap
                 debugTextArray[x,y] = UtilsClass.CreateWorldText(gridArray[x, y].ToString(), null, GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f, 20, Color.black, TextAnchor.MiddleCenter);
                 Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.black, 100f);
                 Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.black, 100f);
-
-                //GameObject cube = GameObject.Instantiate(cubeGO);
-                //cube.transform.localScale *= cellSize;
-                //cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
-
-                //cube.GetComponent<Renderer>().material.color = new Color(1,1,1,0.5f);
             }
         }
         Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.black, 100f);
         Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.black, 100f);
 
-        // Get the heatmap max value in order to normalize the values afterwards
-        GetHeatmapMaxValue(positionArray);
+        // Set grid values
+        SetGridValues(spatialDatas);
+
+        if (HEAT_MAP_MAX_VALUE == 100f)
+        {
+            // Get the heatmap max value in order to normalize the values afterwards
+            GetHeatmapMaxValue();
+        }
 
         // Generate the cubes in their position and with their proper color
-        GenerateCubes(cubeGO, positionArray);
+        GenerateCubes(cubeGO);
     }
 
     private Vector3 GetWorldPosition(int x, int y)
@@ -64,7 +66,7 @@ public class Heatmap
         y = Mathf.FloorToInt((worldPosition - originPosition).z / cellSize);
     }
 
-    public void SetValue(int x, int y, int value)
+    public void SetValue(int x, int y, float value)
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
@@ -75,14 +77,14 @@ public class Heatmap
         }
     }
 
-    public void SetValue(Vector3 worldPosition, int value)
+    public void SetValue(Vector3 worldPosition, float value)
     {
         int x, y;
         GetXY(worldPosition, out x, out y);
         SetValue(x, y, value);
     }
 
-    public int GetValue(int x, int y)
+    public float GetValue(int x, int y)
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
@@ -90,56 +92,63 @@ public class Heatmap
         }
         else
         {
-            return 0;
+            return 0f;
         }
     }
 
-    public int GetValue(Vector3 worldPosition)
+    public float GetValue(Vector3 worldPosition)
     {
         int x, y;
         GetXY(worldPosition, out x, out y);
         return GetValue(x, y);
     }
 
-    // Increment cell value
-    public void IncrementValue(Vector3 worldPosition)
+    // Set grid values
+    private void SetGridValues(List<SpatialData> spatialDatas)
     {
-        int x, y;
-        GetXY(worldPosition, out x, out y);
-        SetValue(x, y, GetValue(x, y) + 1);
+        foreach (SpatialData spatialData in spatialDatas)
+        {
+            int x, y;
+            GetXY(spatialData.position, out x, out y);
+
+            float value = GetValue(x, y) + spatialData.deltaTime;
+            SetValue(x, y, value);
+        }
     }
 
     // Get the heatmap max value in order to normalize the values afterwards
-    private void GetHeatmapMaxValue(Vector3[] positionArray)
+    private void GetHeatmapMaxValue()
     {
-        foreach (Vector3 v in positionArray)
+        for (int x = 0; x < gridArray.GetLength(0); x++)
         {
-            int x, y;
-            GetXY(v, out x, out y);
-
-            int value = GetValue(x, y);
-            if (value > HEAT_MAP_MAX_VALUE)
-                HEAT_MAP_MAX_VALUE = value;
+            for (int y = 0; y < gridArray.GetLength(1); y++)
+            {
+                float value = gridArray[x, y];
+                if (value > HEAT_MAP_MAX_VALUE)
+                    HEAT_MAP_MAX_VALUE = value;
+            }
         }
     }
 
     // Generate the cubes in their position and with their proper color
-    private void GenerateCubes(GameObject cubeGO, Vector3[] positionArray)
+    private void GenerateCubes(GameObject cubeGO)
     {
-        foreach (Vector3 v in positionArray)
+        for (int x = 0; x < gridArray.GetLength(0); x++)
         {
-            int x, y;
-            GetXY(v, out x, out y);
+            for (int y = 0; y < gridArray.GetLength(1); y++)
+            {
+                float value = gridArray[x, y];
+                value /= HEAT_MAP_MAX_VALUE;
+                SetValue(x, y, value);
 
-            GameObject cube = GameObject.Instantiate(cubeGO);
-            cube.transform.localScale *= cellSize;
-            cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
+                GameObject cube = GameObject.Instantiate(cubeGO);
+                cube.transform.localScale *= cellSize;
+                cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
 
-            // Setting up the gradient color
-            float time = GetValue(x, y) / HEAT_MAP_MAX_VALUE;
-            Color gradientColor = gradient.Evaluate(time);
-
-            cube.GetComponent<Renderer>().material.color = gradientColor;
+                // Setting up the gradient color
+                Color gradientColor = gradient.Evaluate(value);
+                cube.GetComponent<Renderer>().material.color = gradientColor;
+            }
         }
     }
 }

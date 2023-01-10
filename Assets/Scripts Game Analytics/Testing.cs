@@ -5,10 +5,14 @@ using CodeMonkey.Utils;
 
 public class Testing : MonoBehaviour
 {
+    // bool limitedMaxValue;
+    // other customizable variables...
+
     public GameObject playerGO;
     public GameObject cubeGO;
 
     private Heatmap grid;
+
     public Gradient gradient = new Gradient
     {
         alphaKeys = new[]
@@ -25,17 +29,15 @@ public class Testing : MonoBehaviour
         }
     };
 
+    List<SpatialData> spatialDatas;
+
     private void Start()
     {
-        grid = new Heatmap(44, 32, 2.5f, new Vector3(-35,0,-40), gradient, cubeGO);
+        grid = new Heatmap(44, 32, 2.5f, new Vector3(-35,0,-40), gradient, spatialDatas, cubeGO);
     }
 
     private void Update()
     {
-        if(Input.GetMouseButtonDown(0))
-        {
-            // Increment cell value
-            grid.IncrementValue(playerGO.transform.position);
-        }
+        
     }
 }
