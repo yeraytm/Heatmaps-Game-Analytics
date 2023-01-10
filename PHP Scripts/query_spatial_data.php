@@ -24,7 +24,7 @@ if($result)
         $row["PositionX"] . "#" . 
         $row["PositionY"] . "#" . 
         $row["PositionZ"] . "#" .
-        $row["Date"] . 
+        $row["DeltaTime"] . 
         "*";
     }
 }

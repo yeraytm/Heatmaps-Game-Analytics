@@ -16,10 +16,10 @@ $playerID = $_POST['PlayerID'];
 $posX = $_POST['PositionX'];
 $posY = $_POST['PositionY'];
 $posZ = $_POST['PositionZ'];
-$date = $_POST['Date'];
+$deltatime = $_POST['DeltaTime'];
 
-$sql = "INSERT INTO SpatialTable (`Type`, `PlayerID`, `PositionX`, `PositionY`, `PositionZ`, `Date`)
-        VALUES('$type', '$playerID', '$posX', '$posY', '$posZ', '$date')";
+$sql = "INSERT INTO SpatialTable (`Type`, `PlayerID`, `PositionX`, `PositionY`, `PositionZ`, `DeltaTime`)
+        VALUES('$type', '$playerID', '$posX', '$posY', '$posZ', '$deltatime')";
 
 if ($conn->query($sql) === TRUE)
 {
