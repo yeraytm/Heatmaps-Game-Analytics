@@ -5,21 +5,22 @@ using CodeMonkey.Utils;
 
 public class Testing : MonoBehaviour
 {
-    [SerializeField]
     public GameObject playerGO;
+    public GameObject cubeGO;
 
     private Grid grid;
 
     private void Start()
     {
-        grid = new Grid(44, 32, 2.5f, new Vector3(-35,0,-40));
+        grid = new Grid(44, 32, 2.5f, new Vector3(-35,0,-40), cubeGO);
     }
 
     private void Update()
     {
         if(Input.GetMouseButtonDown(0))
         {
-            grid.SetValue(playerGO.transform.position, 56);
+            // Increment cell value
+            grid.IncrementValue(playerGO.transform.position);
         }
     }
 }
