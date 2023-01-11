@@ -20,6 +20,9 @@ public class HeatmapGenerator : MonoBehaviour
     [SerializeField] Slider cellSizeSlider;
     [SerializeField] TextMeshProUGUI cellSizeSliderValue;
 
+    [SerializeField] Slider maxValueSlider;
+    [SerializeField] TextMeshProUGUI maxValueSliderValue;
+
     public Gradient gradient = new()
     {
         alphaKeys = new[]
@@ -36,18 +39,31 @@ public class HeatmapGenerator : MonoBehaviour
         }
     };
 
-    // Start is called before the first frame update
+
     void Start()
     {
         cellSizeSlider.onValueChanged.AddListener((v) =>
         {
             cellSize = v;
+
             if (heatmap != null)
                 heatmap.ClearCubes();
 
             GenerateHeatmap();
 
             cellSizeSliderValue.text = v.ToString();
+        });
+
+        maxValueSlider.onValueChanged.AddListener((v) =>
+        {
+            limitedMaxValue = v;
+
+            if (heatmap != null)
+                heatmap.ClearCubes();
+
+            GenerateHeatmap();
+
+            maxValueSliderValue.text = v.ToString();
         });
     }
 
