@@ -84,5 +84,6 @@ public class DataRetriever : MonoBehaviour
         Debug.Log("TOTAL ROWS RETRIEVED: " + count);
 
         gameObject.GetComponent<HeatmapGenerator>().Init(positionsList, killsList, deathsList);
+        gameObject.GetComponent<HeatmapGenerator>().GenerateHeatmap();
     }
 }

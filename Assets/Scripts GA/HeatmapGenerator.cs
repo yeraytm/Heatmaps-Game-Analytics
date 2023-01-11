@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HeatmapGenerator : MonoBehaviour
 {
@@ -16,7 +17,11 @@ public class HeatmapGenerator : MonoBehaviour
     List<SpatialData> deathsList;
 
     // UI
-    //[SerializeField] Slider cellSizeSlider;
+    [SerializeField] Slider cellSizeSlider;
+    [SerializeField] TextMeshProUGUI cellSizeSliderValue;
+    [SerializeField] Button positionsButton;
+    [SerializeField] Button killsButton;
+    [SerializeField] Button deathsButton;
 
     public Gradient gradient = new()
     {
@@ -37,11 +42,15 @@ public class HeatmapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //cellSizeSlider.onValueChanged.AddListener((v) =>
-        //{
-        //    cellSize = v;
-        //    GenerateHeatmap();
-        //});
+        cellSizeSlider.onValueChanged.AddListener((v) =>
+        {
+            cellSize = v;
+            if (heatmap != null)
+                heatmap.ClearCubes();
+            GenerateHeatmap();
+
+            cellSizeSliderValue.text = v.ToString("0");
+        });
     }
 
     public void Init(List<SpatialData> positionsList, List<SpatialData> killsList, List<SpatialData> deathsList)

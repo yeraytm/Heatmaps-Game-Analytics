@@ -34,6 +34,8 @@ public class Heatmap
     bool debugging = false;
     TextMesh[,] debugTextArray;
 
+    GameObject[,] cubeArray;
+
     public Heatmap(HeatmapType type, int width, int height, float cellSize, Vector3 originPosition, float limitedMaxValue, Gradient gradient, GameObject cubeGO, bool debugging, List<SpatialData> positionList, List<SpatialData> dataTypeList = null)
     {
         this.type = type;
@@ -48,6 +50,8 @@ public class Heatmap
 
         debugTextArray = new TextMesh[width, height];
         this.debugging = debugging;
+
+        cubeArray = new GameObject[width, height];
 
         if (debugging)
         {
@@ -216,6 +220,24 @@ public class Heatmap
                     {
                         cube.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0f, 0.25f);
                     }
+
+                    cubeArray[x, y] = cube;
+                }
+            }
+        }
+    }
+
+    // Destroy the cubes
+    public void ClearCubes()
+    {
+        for (int x = 0; x < positionGrid.GetLength(0); x++)
+        {
+            for (int y = 0; y < positionGrid.GetLength(1); y++)
+            {
+                GameObject cube = cubeArray[x, y];
+                if (cube != null)
+                {
+                    GameObject.Destroy(cube);
                 }
             }
         }
