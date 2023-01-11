@@ -6,7 +6,7 @@ using TMPro;
 public class HeatmapGenerator : MonoBehaviour
 {
     public GameObject cubeGO;
-    public HeatmapType type = HeatmapType.POSITIONS;
+    public HeatmapType type = HeatmapType.NONE;
     public float cellSize = 2.5f;
     public float limitedMaxValue = 100f;
     public bool debug = false;
@@ -44,6 +44,7 @@ public class HeatmapGenerator : MonoBehaviour
             cellSize = v;
             if (heatmap != null)
                 heatmap.ClearCubes();
+
             GenerateHeatmap();
 
             cellSizeSliderValue.text = v.ToString();
@@ -75,6 +76,7 @@ public class HeatmapGenerator : MonoBehaviour
 
     public void ChangeHeatmapType(int type)
     {
+        Debug.Log(type);
         if (this.type == (HeatmapType)type)
             return;
 

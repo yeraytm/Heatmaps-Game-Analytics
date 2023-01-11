@@ -7,7 +7,8 @@ public enum HeatmapType
 {
     POSITIONS,
     KILLS,
-    DEATHS
+    DEATHS,
+    NONE
 }
 
 public struct CellData
@@ -18,7 +19,7 @@ public struct CellData
 
 public class Heatmap
 {
-    HeatmapType type = HeatmapType.POSITIONS;
+    HeatmapType type = HeatmapType.NONE;
 
     float HEAT_MAP_MAX_VALUE = 100f;
 
