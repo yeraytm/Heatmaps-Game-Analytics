@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CodeMonkey.Utils;
 
 public class Testing : MonoBehaviour
 {
@@ -10,8 +8,6 @@ public class Testing : MonoBehaviour
 
     public GameObject playerGO;
     public GameObject cubeGO;
-
-    private Heatmap grid;
 
     public Gradient gradient = new Gradient
     {
@@ -23,21 +19,23 @@ public class Testing : MonoBehaviour
 
         colorKeys = new[]
         {
-            new GradientColorKey(Color.red, 0f),
+            new GradientColorKey(Color.blue, 0f),
             new GradientColorKey(Color.green, 0.5f),
-            new GradientColorKey(Color.blue, 1f)
+            new GradientColorKey(Color.red, 1f)
         }
     };
 
-    List<SpatialData> spatialDatas;
+    public bool debug = false;
 
-    private void Start()
-    {
-        grid = new Heatmap(44, 32, 2.5f, new Vector3(-35,0,-40), gradient, spatialDatas, cubeGO);
-    }
+    Heatmap grid;
 
-    private void Update()
+    //void Start()
+    //{
+    //    grid = new Heatmap(44, 32, 2.5f, new Vector3(-35,0,-40), gradient, spatialDatas, cubeGO);
+    //}
+
+    public void GenerateHeatmap(List<SpatialData> spatialDataList)
     {
-        
+        grid = new Heatmap(44, 32, 2.5f, new Vector3(-35, 0, -40), gradient, spatialDataList, cubeGO, debug);
     }
 }

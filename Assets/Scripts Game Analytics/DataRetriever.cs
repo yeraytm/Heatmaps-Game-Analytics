@@ -52,7 +52,12 @@ public class DataRetriever : MonoBehaviour
                                 float z = float.Parse(rowData[4], System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
                                 Vector3 position = new Vector3(x, y, z);
 
-                                SpatialData entry = new SpatialData(rowData[0], uint.Parse(rowData[1]), position, float.Parse(rowData[5]));
+                                SpatialData entry = new SpatialData(
+                                    rowData[0],
+                                    uint.Parse(rowData[1]),
+                                    position,
+                                    float.Parse(rowData[5], System.Globalization.CultureInfo.InvariantCulture.NumberFormat)
+                                    );
 
                                 switch (entry.type)
                                 {
@@ -73,7 +78,7 @@ public class DataRetriever : MonoBehaviour
                                     " PositionX: " + position.x +
                                     " PositionY: " + position.y +
                                     " PositionZ: " + position.z +
-                                    " DeltaTime: " + float.Parse(rowData[5])
+                                    " DeltaTime: " + float.Parse(rowData[5], System.Globalization.CultureInfo.InvariantCulture.NumberFormat)
                                     );
                                 count++;
                             }
@@ -83,5 +88,7 @@ public class DataRetriever : MonoBehaviour
             }
         }
         Debug.Log("TOTAL ROWS RETRIEVED: " + count);
+
+        gameObject.GetComponent<Testing>().GenerateHeatmap(positions);
     }
 }

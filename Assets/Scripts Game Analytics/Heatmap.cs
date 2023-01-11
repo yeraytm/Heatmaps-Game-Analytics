@@ -1,49 +1,41 @@
-using System.Collections;
+using CodeMonkey.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using CodeMonkey.Utils;
 
 public class Heatmap
 {
     public float HEAT_MAP_MAX_VALUE = 100f;
     public const float HEAT_MAP_MIN_VALUE = 0f;
 
-    private int width;
-    private int height;
-    private float cellSize;
-    private Vector3 originPosition;
-    private float[,] gridArray;
-    private TextMesh[,] debugTextArray;
-    private Vector3[] positionArray = new Vector3[0]; // The actual data!
-    private Gradient gradient;
-    private List<SpatialData> spatialDatas;
+    float[,] gridArray;
 
-    public Heatmap(int width, int height, float cellSize, Vector3 originPosition, Gradient gradient, List<SpatialData> spatialDatas, GameObject cubeGO)
+    int width;
+    int height;
+
+    float cellSize;
+
+    Vector3 originPosition;
+
+    Gradient gradient;
+
+    bool debugging = false;
+    TextMesh[,] debugTextArray;
+
+    public Heatmap(int width, int height, float cellSize, Vector3 originPosition, Gradient gradient, List<SpatialData> spatialDataList, GameObject cubeGO, bool debugging)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
         this.originPosition = originPosition;
         this.gradient = gradient;
-        this.spatialDatas = spatialDatas;
 
         gridArray = new float[width, height];
-        debugTextArray = new TextMesh[width, height];
 
-        for (int x = 0; x < gridArray.GetLength(0); x++)
-        {
-            for (int y = 0; y < gridArray.GetLength(1); y++)
-            {
-                debugTextArray[x,y] = UtilsClass.CreateWorldText(gridArray[x, y].ToString(), null, GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f, 20, Color.black, TextAnchor.MiddleCenter);
-                Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.black, 100f);
-                Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.black, 100f);
-            }
-        }
-        Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.black, 100f);
-        Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.black, 100f);
+        debugTextArray = new TextMesh[width, height];
+        this.debugging = debugging;
 
         // Set grid values
-        SetGridValues(spatialDatas);
+        SetGridValues(spatialDataList);
 
         if (HEAT_MAP_MAX_VALUE == 100f)
         {
@@ -53,6 +45,21 @@ public class Heatmap
 
         // Generate the cubes in their position and with their proper color
         GenerateCubes(cubeGO);
+
+        if (debugging)
+        {
+            for (int x = 0; x < gridArray.GetLength(0); x++)
+            {
+                for (int y = 0; y < gridArray.GetLength(1); y++)
+                {
+                    debugTextArray[x, y] = UtilsClass.CreateWorldText(gridArray[x, y].ToString(), null, GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f, 8, Color.black, TextAnchor.MiddleCenter);
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.black, 100f);
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.black, 100f);
+                }
+            }
+            Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.black, 100f);
+            Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.black, 100f);
+        }
     }
 
     private Vector3 GetWorldPosition(int x, int y)
@@ -72,8 +79,11 @@ public class Heatmap
         {
             if (value > HEAT_MAP_MAX_VALUE)
                 HEAT_MAP_MAX_VALUE = value;
+            
             gridArray[x, y] = Mathf.Clamp(value, HEAT_MAP_MIN_VALUE, HEAT_MAP_MAX_VALUE);
-            debugTextArray[x, y].text = gridArray[x,y].ToString();
+
+            if (debugging)
+                debugTextArray[x, y].text = gridArray[x, y].ToString();
         }
     }
 
@@ -104,9 +114,9 @@ public class Heatmap
     }
 
     // Set grid values
-    private void SetGridValues(List<SpatialData> spatialDatas)
+    private void SetGridValues(List<SpatialData> spatialDataList)
     {
-        foreach (SpatialData spatialData in spatialDatas)
+        foreach (SpatialData spatialData in spatialDataList)
         {
             int x, y;
             GetXY(spatialData.position, out x, out y);
@@ -141,13 +151,16 @@ public class Heatmap
                 value /= HEAT_MAP_MAX_VALUE;
                 SetValue(x, y, value);
 
-                GameObject cube = GameObject.Instantiate(cubeGO);
-                cube.transform.localScale *= cellSize;
-                cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
+                if (value != 0.0f || debugging)
+                {
+                    GameObject cube = GameObject.Instantiate(cubeGO);
+                    cube.transform.localScale *= cellSize;
+                    cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
 
-                // Setting up the gradient color
-                Color gradientColor = gradient.Evaluate(value);
-                cube.GetComponent<Renderer>().material.color = gradientColor;
+                    // Setting up the gradient color
+                    Color gradientColor = gradient.Evaluate(value);
+                    cube.GetComponent<Renderer>().material.color = gradientColor;
+                }
             }
         }
     }
