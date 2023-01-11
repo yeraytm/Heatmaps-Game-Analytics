@@ -19,9 +19,6 @@ public class HeatmapGenerator : MonoBehaviour
     // UI
     [SerializeField] Slider cellSizeSlider;
     [SerializeField] TextMeshProUGUI cellSizeSliderValue;
-    [SerializeField] Button positionsButton;
-    [SerializeField] Button killsButton;
-    [SerializeField] Button deathsButton;
 
     public Gradient gradient = new()
     {
@@ -85,6 +82,7 @@ public class HeatmapGenerator : MonoBehaviour
 
         if (heatmap != null)
             heatmap.ClearCubes();
+
         GenerateHeatmap();
     }
 }
