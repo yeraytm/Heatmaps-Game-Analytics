@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -8,9 +9,11 @@ public class DataRetriever : MonoBehaviour
     public string db = "https://citmalumnes.upc.es/~yeraytm/query_spatial_data.php";
     uint count = 0;
 
-    List<SpatialData> positionList = new List<SpatialData>();
-    List<SpatialData> killList = new List<SpatialData>();
-    List<SpatialData> deathList = new List<SpatialData>();
+    List<SpatialData> positionsList = new List<SpatialData>();
+    List<SpatialData> killsList = new List<SpatialData>();
+    List<SpatialData> deathsList = new List<SpatialData>();
+
+    public static event Action<List<SpatialData>, List<SpatialData>> SpatialEvent;
 
     void Start()
     {
@@ -62,13 +65,13 @@ public class DataRetriever : MonoBehaviour
                                 switch (entry.type)
                                 {
                                     case "Position":
-                                        positionList.Add(entry);
+                                        positionsList.Add(entry);
                                         break;
                                     case "Kill":
-                                        killList.Add(entry);
+                                        killsList.Add(entry);
                                         break;
                                     case "Death":
-                                        deathList.Add(entry);
+                                        deathsList.Add(entry);
                                         break;
                                 }
                                 count++;
@@ -80,6 +83,6 @@ public class DataRetriever : MonoBehaviour
         }
         Debug.Log("TOTAL ROWS RETRIEVED: " + count);
 
-        gameObject.GetComponent<HeatmapGenerator>().GenerateHeatmap(positionList);
+        gameObject.GetComponent<HeatmapGenerator>().Init(positionsList, killsList, deathsList);
     }
 }

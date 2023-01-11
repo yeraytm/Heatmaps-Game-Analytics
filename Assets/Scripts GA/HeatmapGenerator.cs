@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HeatmapGenerator : MonoBehaviour
 {
@@ -10,6 +11,12 @@ public class HeatmapGenerator : MonoBehaviour
     public bool debug = false;
 
     Heatmap heatmap;
+    List<SpatialData> positionsList;
+    List<SpatialData> killsList;
+    List<SpatialData> deathsList;
+
+    // UI
+    //[SerializeField] Slider cellSizeSlider;
 
     public Gradient gradient = new()
     {
@@ -27,8 +34,36 @@ public class HeatmapGenerator : MonoBehaviour
         }
     };
 
-    public void GenerateHeatmap(List<SpatialData> positionList, List<SpatialData> dataTypeList = null)
+    // Start is called before the first frame update
+    void Start()
     {
-        heatmap = new Heatmap(type, (int)(150f / cellSize), (int)(100f / cellSize), cellSize, new Vector3(-50, 0, -50), limitedMaxValue, gradient, cubeGO, debug, positionList);
+        //cellSizeSlider.onValueChanged.AddListener((v) =>
+        //{
+        //    cellSize = v;
+        //    GenerateHeatmap();
+        //});
+    }
+
+    public void Init(List<SpatialData> positionsList, List<SpatialData> killsList, List<SpatialData> deathsList)
+    {
+        this.positionsList = positionsList;
+        this.killsList = killsList;
+        this.deathsList = deathsList;
+    }
+
+    public void GenerateHeatmap()
+    {
+        switch (type)
+        {
+            case HeatmapType.POSITIONS:
+                heatmap = new Heatmap(type, (int)(150f / cellSize), (int)(100f / cellSize), cellSize, new Vector3(-50, 0, -50), limitedMaxValue, gradient, cubeGO, debug, positionsList);
+                break;
+            case HeatmapType.KILLS:
+                heatmap = new Heatmap(type, (int)(150f / cellSize), (int)(100f / cellSize), cellSize, new Vector3(-50, 0, -50), limitedMaxValue, gradient, cubeGO, debug, positionsList, killsList);
+                break;
+            case HeatmapType.DEATHS:
+                heatmap = new Heatmap(type, (int)(150f / cellSize), (int)(100f / cellSize), cellSize, new Vector3(-50, 0, -50), limitedMaxValue, gradient, cubeGO, debug, positionsList, deathsList);
+                break;
+        }
     }
 }

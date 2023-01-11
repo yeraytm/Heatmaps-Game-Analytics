@@ -10,21 +10,26 @@ public enum HeatmapType
     DEATHS
 }
 
+public struct CellData
+{
+    public float value;
+    public float height;
+}
+
 public class Heatmap
 {
     HeatmapType type = HeatmapType.POSITIONS;
 
     float HEAT_MAP_MAX_VALUE = 100f;
 
-    float[,] positionGrid;
-    float[,] dataTypeGrid;
+    CellData[,] positionGrid;
+    CellData[,] dataTypeGrid;
 
     int width;
     int height;
     float cellSize;
     Vector3 originPosition;
     Gradient gradient;
-    float[,] heightArray;
 
     bool debugging = false;
     TextMesh[,] debugTextArray;
@@ -39,8 +44,7 @@ public class Heatmap
         HEAT_MAP_MAX_VALUE = limitedMaxValue;
         this.gradient = gradient;
 
-        positionGrid = new float[width, height];
-        heightArray = new float[width, height];
+        positionGrid = new CellData[width, height];
 
         debugTextArray = new TextMesh[width, height];
         this.debugging = debugging;
@@ -51,7 +55,7 @@ public class Heatmap
             {
                 for (int y = 0; y < positionGrid.GetLength(1); y++)
                 {
-                    debugTextArray[x, y] = UtilsClass.CreateWorldText(positionGrid[x, y].ToString("F3"), null, GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f, 8, Color.black, TextAnchor.MiddleCenter);
+                    debugTextArray[x, y] = UtilsClass.CreateWorldText(positionGrid[x, y].value.ToString("F3"), null, GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f, 8, Color.black, TextAnchor.MiddleCenter);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.black, 100f);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.black, 100f);
                 }
@@ -72,14 +76,14 @@ public class Heatmap
         // Normalize the heatmap values
         NormalizeHeatmapPositionValues();
 
-        if (type == HeatmapType.KILLS)
-        {
-
-        }
-        else if (type == HeatmapType.DEATHS)
-        {
-
-        }
+        //if (type == HeatmapType.KILLS)
+        //{
+        //    dataTypeGrid = new CellData[width, height];
+        //}
+        //else if (type == HeatmapType.DEATHS)
+        //{
+        //    dataTypeGrid = new CellData[width, height];
+        //}
 
         // Generate the cubes in their position and with their proper color
         GenerateCubes(cubeGO);
@@ -100,10 +104,10 @@ public class Heatmap
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            positionGrid[x,y] = value;
+            positionGrid[x,y].value = value;
 
             if (debugging)
-                debugTextArray[x, y].text = positionGrid[x, y].ToString("F3");
+                debugTextArray[x, y].text = positionGrid[x, y].value.ToString("F3");
         }
     }
 
@@ -118,7 +122,7 @@ public class Heatmap
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            return positionGrid[x, y];
+            return positionGrid[x, y].value;
         }
         else
         {
@@ -135,7 +139,7 @@ public class Heatmap
 
     void SetHeight(int x, int y, float height)
     {
-        heightArray[x, y] = height;
+        positionGrid[x, y].height = height;
     }
 
     // Set grid values
@@ -150,8 +154,8 @@ public class Heatmap
             SetValue(x, y, value);
 
             float height;
-            if (heightArray[x, y] != 0)
-                height = (heightArray[x, y] + spatialData.position.y) / 2;
+            if (positionGrid[x, y].height != 0)
+                height = (positionGrid[x, y].height + spatialData.position.y) / 2;
             else
                 height = spatialData.position.y;
 
@@ -166,7 +170,7 @@ public class Heatmap
         {
             for (int y = 0; y < positionGrid.GetLength(1); y++)
             {
-                float value = positionGrid[x, y];
+                float value = positionGrid[x, y].value;
                 if (value > HEAT_MAP_MAX_VALUE)
                     HEAT_MAP_MAX_VALUE = value;
             }
@@ -179,7 +183,7 @@ public class Heatmap
         {
             for (int y = 0; y < positionGrid.GetLength(1); y++)
             {
-                float value = positionGrid[x, y];
+                float value = positionGrid[x, y].value;
                 value /= HEAT_MAP_MAX_VALUE;
                 SetValue(x, y, value);
             }
@@ -193,14 +197,14 @@ public class Heatmap
         {
             for (int y = 0; y < positionGrid.GetLength(1); y++)
             {
-                float value = positionGrid[x, y];
+                float value = positionGrid[x, y].value;
 
                 if (value != 0.0f || debugging)
                 {
                     GameObject cube = GameObject.Instantiate(cubeGO);
                     cube.transform.localScale *= cellSize;
 
-                    cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f + new Vector3(0, heightArray[x, y] + cellSize * .5f, 0);
+                    cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f + new Vector3(0, positionGrid[x, y].height + cellSize * .5f, 0);
 
                     if (value != 0.0f)
                     {
