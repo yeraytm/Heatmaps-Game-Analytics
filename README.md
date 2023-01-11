@@ -4,4 +4,4 @@
 
 Unity Project of a heatmap generation demo.
 
-Allows to modify granularity of the map and change the type of data to display.
+Allows to play with the granularity and scale of the map and change the type of data to display.
