@@ -72,7 +72,7 @@ public class Heatmap
         // Set grid values
         SetGridValues(positionList);
 
-        if (HEAT_MAP_MAX_VALUE == 100f)
+        if (HEAT_MAP_MAX_VALUE == 0f)
         {
             // Get the heatmap max value in order to normalize the values afterwards
             GetGridMaxValue(HeatmapGrid);
@@ -88,7 +88,7 @@ public class Heatmap
             // Set grid values
             SetEventGridValues(eventList, eventGrid);
 
-            if (HEAT_MAP_MAX_VALUE == 100f)
+            if (HEAT_MAP_MAX_VALUE == 0f)
             {
                 // Get the heatmap max value in order to normalize the values afterwards
                 GetGridMaxValue(eventGrid);
