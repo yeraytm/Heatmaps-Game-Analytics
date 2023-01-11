@@ -49,7 +49,7 @@ public class HeatmapGenerator : MonoBehaviour
                 heatmap.ClearCubes();
             GenerateHeatmap();
 
-            cellSizeSliderValue.text = v.ToString("0");
+            cellSizeSliderValue.text = v.ToString();
         });
     }
 
