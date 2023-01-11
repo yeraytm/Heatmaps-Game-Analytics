@@ -75,4 +75,16 @@ public class HeatmapGenerator : MonoBehaviour
                 break;
         }
     }
+
+    public void ChangeHeatmapType(int type)
+    {
+        if (this.type == (HeatmapType)type)
+            return;
+
+        this.type = (HeatmapType)type;
+
+        if (heatmap != null)
+            heatmap.ClearCubes();
+        GenerateHeatmap();
+    }
 }
