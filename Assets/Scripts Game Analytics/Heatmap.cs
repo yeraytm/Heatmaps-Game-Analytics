@@ -1,6 +1,7 @@
-using CodeMonkey.Utils;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CodeMonkey.Utils;
 
 public class Heatmap
 {
@@ -8,18 +9,14 @@ public class Heatmap
     public const float HEAT_MAP_MIN_VALUE = 0f;
 
     float[,] gridArray;
-
     int width;
     int height;
-
     float cellSize;
-
     Vector3 originPosition;
-
     Gradient gradient;
-
     bool debugging = false;
     TextMesh[,] debugTextArray;
+    float[,] heightArray;
 
     public Heatmap(int width, int height, float cellSize, Vector3 originPosition, Gradient gradient, List<SpatialData> spatialDataList, GameObject cubeGO, bool debugging)
     {
@@ -30,21 +27,9 @@ public class Heatmap
         this.gradient = gradient;
 
         gridArray = new float[width, height];
-
         debugTextArray = new TextMesh[width, height];
         this.debugging = debugging;
-
-        // Set grid values
-        SetGridValues(spatialDataList);
-
-        if (HEAT_MAP_MAX_VALUE == 100f)
-        {
-            // Get the heatmap max value in order to normalize the values afterwards
-            GetHeatmapMaxValue();
-        }
-
-        // Generate the cubes in their position and with their proper color
-        GenerateCubes(cubeGO);
+        heightArray = new float[width, height];
 
         if (debugging)
         {
@@ -60,6 +45,18 @@ public class Heatmap
             Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.black, 100f);
             Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.black, 100f);
         }
+
+        // Set grid values
+        SetGridValues(spatialDataList);
+
+        //if (HEAT_MAP_MAX_VALUE == 100f)
+        //{
+            // Get the heatmap max value in order to normalize the values afterwards
+            GetHeatmapMaxValue();
+        //}
+
+        // Generate the cubes in their position and with their proper color
+        GenerateCubes(cubeGO);
     }
 
     private Vector3 GetWorldPosition(int x, int y)
@@ -77,10 +74,12 @@ public class Heatmap
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            if (value > HEAT_MAP_MAX_VALUE)
-                HEAT_MAP_MAX_VALUE = value;
-            
-            gridArray[x, y] = Mathf.Clamp(value, HEAT_MAP_MIN_VALUE, HEAT_MAP_MAX_VALUE);
+            //if (value > HEAT_MAP_MAX_VALUE)
+            //    HEAT_MAP_MAX_VALUE = value;
+
+            //gridArray[x, y] = Mathf.Clamp(value, HEAT_MAP_MIN_VALUE, HEAT_MAP_MAX_VALUE);
+
+            gridArray[x,y] = value;
 
             if (debugging)
                 debugTextArray[x, y].text = gridArray[x, y].ToString();
@@ -113,6 +112,11 @@ public class Heatmap
         return GetValue(x, y);
     }
 
+    public void SetHeight(int x, int y, float height)
+    {
+        heightArray[x, y] = height;
+    }
+
     // Set grid values
     private void SetGridValues(List<SpatialData> spatialDataList)
     {
@@ -123,6 +127,13 @@ public class Heatmap
 
             float value = GetValue(x, y) + spatialData.deltaTime;
             SetValue(x, y, value);
+
+            float height;
+            if (heightArray[x, y] != 0)
+                height = (heightArray[x, y] + spatialData.position.y) / 2;
+            else
+                height = spatialData.position.y;
+            SetHeight(x, y, height);
         }
     }
 
@@ -155,11 +166,18 @@ public class Heatmap
                 {
                     GameObject cube = GameObject.Instantiate(cubeGO);
                     cube.transform.localScale *= cellSize;
-                    cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f;
+                    cube.transform.position = GetWorldPosition(x, y) + new Vector3(cellSize, 0, cellSize) * .5f + new Vector3(0, heightArray[x, y] + cellSize* .5f, 0);
 
-                    // Setting up the gradient color
-                    Color gradientColor = gradient.Evaluate(value);
-                    cube.GetComponent<Renderer>().material.color = gradientColor;
+                    if (value != 0)
+                    {
+                        // Setting up the gradient color
+                        Color gradientColor = gradient.Evaluate(value);
+                        cube.GetComponent<Renderer>().material.color = gradientColor;
+                    }
+                    else
+                    {
+                        cube.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0f, 0.5f);
+                    }
                 }
             }
         }

@@ -8,6 +8,9 @@ public class Testing : MonoBehaviour
 
     public GameObject playerGO;
     public GameObject cubeGO;
+    public float cellSize = 2.5f;
+    public bool debug = false;
+    Heatmap grid;
 
     public Gradient gradient = new Gradient
     {
@@ -25,10 +28,6 @@ public class Testing : MonoBehaviour
         }
     };
 
-    public bool debug = false;
-
-    Heatmap grid;
-
     //void Start()
     //{
     //    grid = new Heatmap(44, 32, 2.5f, new Vector3(-35,0,-40), gradient, spatialDatas, cubeGO);
@@ -36,6 +35,6 @@ public class Testing : MonoBehaviour
 
     public void GenerateHeatmap(List<SpatialData> spatialDataList)
     {
-        grid = new Heatmap(44, 32, 2.5f, new Vector3(-35, 0, -40), gradient, spatialDataList, cubeGO, debug);
+        grid = new Heatmap((int)(150f / cellSize), (int)(100f / cellSize), cellSize, new Vector3(-50, 0, -50), gradient, spatialDataList, cubeGO, debug);
     }
 }
