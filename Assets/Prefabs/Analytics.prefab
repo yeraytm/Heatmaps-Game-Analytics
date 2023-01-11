@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b599328b6f9fb44696a187c0535152b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  db: https://citmalumnes.upc.es/~yeraytm/spatial_data.php
 --- !u!114 &7623468027711606594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59,3 +60,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerID: 0
   player: {fileID: 0}
+  samplingRate: 0.75
+  riskRadius: 6
+  enemyColliderLayerMask:
+    serializedVersion: 2
+    m_Bits: 8388608
